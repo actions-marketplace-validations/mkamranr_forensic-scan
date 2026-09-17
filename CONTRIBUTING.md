@@ -78,7 +78,7 @@ Grammars come from `tree-sitter-language-pack`, so no build step is involved.
 
 ```bash
 uv sync
-uv run pytest                 # 500+ tests
+uv run pytest                 # 519 tests
 uv run ruff check src tests
 uv run ruff format src tests
 uv run mypy                   # strict
