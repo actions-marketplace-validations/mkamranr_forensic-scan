@@ -139,6 +139,11 @@ jobs:
           fail-on: HIGH
 ```
 
+The Security-tab upload needs code scanning, which private repositories only
+get with GitHub Advanced Security. Without it the upload is skipped and the
+check still passes or fails on the scan's own result; findings remain in the
+step summary.
+
 ## Two ways to run it
 
 **Pull-request gate** — the default posture, and the one tuned hardest.

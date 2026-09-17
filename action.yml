@@ -114,8 +114,12 @@ runs:
         cat forensic-scan.md >> "$GITHUB_STEP_SUMMARY"
         exit $STATUS
 
+    # Code scanning is unavailable on private repositories without GitHub
+    # Advanced Security. The scan's own exit status is the gate, so a failed
+    # upload must not turn a passing check red.
     - name: Upload SARIF
       if: always() && inputs.upload-sarif == 'true'
+      continue-on-error: true
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: forensic-scan.sarif

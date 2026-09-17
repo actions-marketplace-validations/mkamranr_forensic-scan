@@ -81,8 +81,12 @@ jobs:
         run: |
           uv run forensic-scan src \
             --format sarif --output forensic.sarif --fail-on HIGH
+      # Uploading to the Security tab needs code scanning, which private repos
+      # only get with GitHub Advanced Security. The scan above is the gate; the
+      # upload is a convenience, so its absence must not fail the build.
       - uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: forensic.sarif
           category: forensic-scan
