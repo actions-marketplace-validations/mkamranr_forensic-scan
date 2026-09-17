@@ -1,0 +1,9 @@
+{
+  "name": "inert-sample-postinstall",
+  "version": "1.0.0",
+  "description": "INERT SAMPLE -- npm lifecycle hook attack shape. Does nothing.",
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js",
+    "test": "echo no tests"
+  }
+}

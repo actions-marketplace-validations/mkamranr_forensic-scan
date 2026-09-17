@@ -1,0 +1,39 @@
+"""Pinned root certificate, embedded so the client has no runtime dependency.
+
+The literal below is 1.6 KB of base64 with entropy above every threshold in this
+scanner. It is also completely ordinary. This is the canonical false positive
+for entropy-based detection, which is why entropy is a feature here and not a
+rule.
+"""
+
+ROOT_CA_PEM = """-----BEGIN CERTIFICATE-----
+c92P2+zHd3OC2pYwL82DeaGdyy8Yck0kF4nP47GiCpj7ZfZzp72dpiifA9SHEA8J
+MOE9mQfHdlNwl9cyhDujS38BqRV1p0do/43+7tcVtUFQwjqDSQcRkMQbZhvYSmIR
+9QTYrwA2Ne3pDXhg+rVlaxKQoTLHrEVWFk9VA/ZowuweIj+0GQIPd8x8La6PMHKC
+MPy7xCFrpGIdZWv9NgBF3fj5zZdN/+IFNS9k/tqapJMZCv0lNnFCAsWcVNRLYhIT
+FzWVoj4DmV5fn3Qg9ZZ71ZMi3WIuoCdP6DrRnD+5MCi9ofCNMq/zY+F7mhRrDBob
+CYP2QT29tGRBa9LnmH1LhSztuPoRIDp6j6fanZ0SRzbq6jS/BBFEaXI/DwstSF6H
+kvkhF1wj5HP7VKi7sIWV8iOXCOwEeelbs0/2CAWZohN7EbtPUSL/EhNzi168C+bv
+vLy0Icv26ldaFa955hPf22rxygfdf5IDn6lhYZUDmxIUF6Md/kHharpUY++8sZR1
+cHbWihWEwIMHT5kWewU69bIcf8edqOt8QeUCXk0krZwzhCvA51eo7nF/5D1TZ6pA
+MqJuzc7B6jPhNmI4letRNSIif1nW5dkKthDz+kbSKxxzeEbsNtRpYaCFfqxQt9bX
++59zUhPUCEffmwqttUeSWk+mypAEpCJndDAGxNREPMckywz7oR1yG6GJp6POXvUT
+rzIz0nlBLbYCwXiItgktOUXHWIqy8oWAnf/BKGTZyrPnORZp7uS4YyFzdDKg4+gB
+YIyRp+GAy9HxV3ZTpvs0Gbjd0cyk7LcfNj7mY/sW+k+J+sruUkPot9sEWYEVCXBX
+jGvERnzrBzfP3hBtzAgsiFWvyeojeCb/hOa5hNetsHDy4X6U8rAWwjhwho9K1LqP
+oyqFg9foj0FPq2H02N7mnDVN2ST3i4ZFkn8zaYkdgAGaYAeJ+AuE6maLzf2QH30X
+sCoQ7ol1aev0zOxnRD95fiBWb+bQ7+breYZRGzFrngfsQiGzx/oFCTEnOgOvSFK5
+Wj6efxp/u5Uf2oKfQLcys4fgbwVgomnTh50oiTTdoYijN4c32YqcltsiO+q9oM9Y
+5y5QmlDk7DE3x/8x4xgi4z0huhZCYxhv1fBri8q0IDNnoK/MBBgzka5b6dL3XB20
+gaLCV4D/r9UwzRJ7GwYJw42dg+eReyUwLx00LNco/UjtrBiUDyLzrnYTwxhTZHdt
+g1puNZlfA6KzCtgzLmh0XL1eZ+sxmioYg8oDUuQVzde04NzoofBnkZkwgZX7V87D
+QkfpHb6+xyjQ72ci5VThibFexG7DLmc0uC8SzFdNeBkC41v9o+efDDtF8faqTFY3
+qGeRLogTY4P/f6Q2sx7DZfqTBR2dG708QXFmgQzCMqVgAhlCQEbnV4yKgmr3hZHY
+/hmjcc+lE4yYq8L0C2Lu8ChiePgr236KnJgObfF+a0iGZplPXYdJe6dFj+1Iqbe/
+SwYDxT6VCqIoaMGvYw3lUL9lDJT9ufFREsznOW24ekD5wT4LhRnvz7nodyT69dE+
+mrQdDJ9qdB403A1bhycfXXEjqmp0mUOjla5rXce+h9D/I/NKuyA9ex2A5E/IgZ/Y
+-----END CERTIFICATE-----"""
+
+
+def pinned_roots():
+    return [ROOT_CA_PEM]
