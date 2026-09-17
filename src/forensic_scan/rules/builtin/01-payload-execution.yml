@@ -1,0 +1,58 @@
+# Payloads that reach an execution sink.
+#
+# These are the highest-confidence rules in the scanner, because they describe
+# a *relationship* rather than a construct. `eval` is common; a 500-byte base64
+# literal that reaches `eval` through a decoder is not.
+version: "1.0"
+rules:
+  - id: FOR-001
+    name: High-entropy payload reaches dynamic execution
+    severity: CRITICAL
+    detail: >-
+      A string literal of {source_length:.0f} characters ({alphabet}, entropy
+      {source_entropy:.2f}) flows into {sink}. Trace: {trace}
+    remediation: >-
+      An encoded payload is being executed at runtime. Decode the literal and
+      read what it does before anything else. Legitimate code has no reason to
+      hide a program inside a string.
+    match:
+      signal: taint_flow
+      features:
+        source_length: {min: 40}
+        source_looks_encoded: {min: 1}
+
+  - id: FOR-004
+    name: Encoded payload reaches execution after decoding
+    severity: CRITICAL
+    detail: >-
+      A {source_length:.0f}-character literal is decoded via {decoders} and then
+      passed to {sink}. Trace: {trace}
+    remediation: >-
+      The decode step exists to hide the payload from review. Recover the
+      decoded content and treat it as untrusted until you have read it.
+    match:
+      signal: taint_flow
+      features:
+        through_decoder: {min: 1}
+        source_length: {min: 40}
+
+  - id: FOR-014
+    name: Encoded blob in a file that executes code
+    severity: MEDIUM
+    detail: >-
+      A {length:.0f}-character {alphabet} literal sits in a file that also calls
+      a dynamic execution function. No data flow was proven between them.
+    remediation: >-
+      Confirm the encoded literal is unrelated to the execution sink in this
+      file. If they are related, the data flow analyser missed the connection,
+      which usually means it was deliberately obscured.
+    match:
+      signal: encoded_alphabet_string
+      also_in_file: [dynamic_exec_sink]
+      metadata:
+        # An actual encoding alphabet. Without this the rule fired on long
+        # prose -- and reported it as "a 67-character natural literal", which
+        # refutes itself in its own sentence.
+        alphabet: {in: [base64, hex, base32]}
+      features:
+        length: {min: 64}

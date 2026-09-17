@@ -1,0 +1,93 @@
+# The structural residue of concealment.
+#
+# These survive renaming, which is what makes them worth having: an attacker can
+# avoid the word `eval`, but hiding a string still leaves the shape of hiding.
+version: "1.0"
+rules:
+  - id: FOR-003
+    name: String constructed from character codes
+    severity: HIGH
+    detail: >-
+      A string is assembled from character codes rather than written literally
+      ({form}, {printable_ratio:.0%} printable ASCII).
+    remediation: >-
+      Character-code construction exists to keep a string out of a grep and out
+      of a reviewer's eye. Reconstruct the string and read it.
+    match:
+      signal: charcode_construction
+      features:
+        # Lookup tables are long numeric arrays too. What separates them is the
+        # value range: character codes are printable ASCII, a CRC-32 table is
+        # 32-bit words, a colour palette is uniform over 0-255.
+        printable_ratio: {min: 0.8}
+
+  - id: FOR-015
+    name: Machine-generated identifier naming
+    severity: MEDIUM
+    detail: >-
+      {mangled_count:.0f} of {identifier_count:.0f} identifiers look
+      machine-generated (for example: {examples}).
+    remediation: >-
+      This file has been through an obfuscator. That is normal for a vendored
+      bundle and abnormal for source under review -- confirm which this is, and
+      that a readable original exists.
+    match:
+      signal: high_entropy_identifiers
+      features:
+        mangled_ratio: {min: 0.3}
+
+  - id: FOR-016
+    name: Bitwise decoding loop over file contents
+    severity: MEDIUM
+    detail: >-
+      A loop applies {operator} over a buffer in a file that also reads a file
+      from disk.
+    remediation: >-
+      A byte-transformation loop applied to file contents is a decoder. Find out
+      what it decodes and what happens to the result.
+    match:
+      signal: bitwise_decode_loop
+      also_in_file: [file_read]
+
+  - id: FOR-017
+    name: Module loaded under a computed name
+    # LOW, not MEDIUM: `importlib.import_module(name)` occurs 130 times in the
+    # Python standard library, which is how plugin systems and codec registries
+    # are written. Worth seeing, never worth blocking on.
+    severity: LOW
+    detail: "{sink} is called with a non-literal module name: {argument}"
+    remediation: >-
+      A computed import hides which module is loaded from every static analysis,
+      including this one. Replace it with a literal name if you can.
+    match:
+      signal: dynamic_import
+
+  - id: FOR-018
+    name: Symbol resolved at runtime
+    severity: LOW
+    detail: "{sink} resolves a symbol by name at runtime"
+    remediation: >-
+      Common and usually legitimate. It matters alongside other signals in the
+      same file, where it is how a payload reaches a function it must not name.
+    match:
+      signal: dynamic_symbol_resolution
+
+  - id: FOR-019
+    name: Inline assembly
+    severity: LOW
+    detail: "inline assembly block: {construct}"
+    remediation: >-
+      Inline assembly is invisible to source-level analysis. Confirm it is
+      expected in this file and that it does not alter control flow.
+    match:
+      signal: inline_assembly
+
+  - id: FOR-020
+    name: String assembled from many fragments
+    severity: LOW
+    detail: "a string is built from {segments:.0f} concatenated literals"
+    remediation: >-
+      Splitting a string across many literals defeats searching for it.
+      Reassemble it and check what it spells.
+    match:
+      signal: string_concat_chain

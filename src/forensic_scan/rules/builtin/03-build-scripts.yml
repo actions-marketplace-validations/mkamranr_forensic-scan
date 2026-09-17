@@ -1,0 +1,96 @@
+# Code that runs during build and install.
+#
+# Install hooks execute without anyone calling them, on machines whose owners
+# never read them. The same call is unremarkable in application code and
+# alarming here -- the file it sits in is the entire detection.
+version: "1.0"
+rules:
+  - id: FOR-005
+    name: Shell or dynamic execution during install
+    severity: HIGH
+    detail: "{what} runs during the {phase} phase{context}"
+    remediation: >-
+      Establish exactly what this command does. Install-time execution is the
+      most heavily abused surface in the packaging ecosystem: it runs
+      automatically, as the installing user, on every machine that takes the
+      dependency.
+    match:
+      signal: build_shell_exec
+      metadata:
+        # Scoped to phases that run on their own. `pip install` executes
+        # setup.py and `npm install` executes postinstall; `make test` is
+        # something a person types, having decided to.
+        auto_run: {equals: "yes"}
+        # `subprocess.check_output(["pkg-config", "--cflags", "zlib"])` appears
+        # in thousands of legitimate setup.py files. Reporting it at HIGH
+        # teaches maintainers to ignore the scanner.
+        known_tool: {equals: "no"}
+
+  - id: FOR-021
+    name: Shell execution during build
+    severity: LOW
+    detail: "{what} runs during the {phase} phase{context}"
+    remediation: >-
+      Ordinary in a Makefile or CMake target, which run only when invoked.
+      Worth a look alongside network access or decoding in the same file.
+    match:
+      signal: build_shell_exec
+      metadata:
+        auto_run: {equals: "no"}
+
+  - id: FOR-022
+    name: Recognised build tool invoked during install
+    severity: INFO
+    detail: "{what} invokes a known build tool during the {phase} phase{context}"
+    remediation: >-
+      Expected in a package that compiles an extension. Confirm the tool is the
+      one you think it is and that its arguments are not attacker-controlled.
+    match:
+      signal: build_shell_exec
+      metadata:
+        known_tool: {equals: "yes"}
+
+  - id: FOR-006
+    name: Network access during install
+    severity: HIGH
+    detail: "{what} reaches the network during the {phase} phase{context}"
+    remediation: >-
+      A build that downloads code is a build whose output is not determined by
+      its source. Vendor the dependency or pin and verify it by hash.
+    match:
+      signal: build_network_access
+      metadata:
+        auto_run: {equals: "yes"}
+
+  - id: FOR-024
+    name: Network access during build
+    severity: MEDIUM
+    detail: "{what} reaches the network during the {phase} phase{context}"
+    remediation: >-
+      Common in Makefile targets that fetch test data or regenerate sources.
+      Confirm the URL is pinned and the result is verified.
+    match:
+      signal: build_network_access
+      metadata:
+        auto_run: {equals: "no"}
+
+  - id: FOR-007
+    name: Decompression or decoding during build or install
+    severity: MEDIUM
+    detail: "{what} decodes data during the {phase} phase{context}"
+    remediation: >-
+      Identify what is being decoded and where it came from. Decoding during
+      install is how a payload gets from an inert asset into a running process.
+    match:
+      signal: build_decompression
+
+  - id: FOR-008
+    name: Build macro executes a computed command
+    severity: HIGH
+    detail: "{why}: {what} in the {phase} phase"
+    remediation: >-
+      Autoconf and m4 files are rarely reviewed and run before anything else.
+      This is the mechanism the XZ Utils backdoor used. Compare the file against
+      upstream and read what the macro expands to.
+    match:
+      signal: build_macro_anomaly

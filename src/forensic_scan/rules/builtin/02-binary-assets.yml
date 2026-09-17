@@ -1,0 +1,101 @@
+# Payloads smuggled in files that are not code.
+#
+# Where the XZ Utils backdoor lived. Test fixtures are the ideal hiding place:
+# nobody reads them, no linter parses them, and a repository full of
+# deliberately corrupt archives makes one more look unremarkable.
+version: "1.0"
+rules:
+  - id: FOR-002
+    name: Hidden executable or archive in a non-code asset
+    severity: CRITICAL
+    detail: >-
+      This file's extension claims {declared}, but its bytes are {detected}
+      ({detected_category}).
+    remediation: >-
+      A file whose contents are more capable than its name admits is doing so
+      deliberately. Establish what the file really is and which code reads it.
+      This is close to the only signal in this scanner with no benign
+      explanation.
+    match:
+      signal: magic_mismatch
+      metadata:
+        # Direction matters. A .png holding an ELF is a payload in a costume. A
+        # .tar holding plain text is a malformed test fixture -- CPython ships
+        # one deliberately -- and reporting the two at the same severity makes
+        # the severe one unfindable.
+        detected_category: {in: [executable, archive]}
+
+  - id: FOR-023
+    name: Asset contents do not match its extension
+    severity: LOW
+    detail: >-
+      This file's extension claims {declared}, but its bytes are {detected}
+      ({detected_category}) -- a less capable format than claimed.
+    remediation: >-
+      Usually a malformed or deliberately corrupt test fixture. Confirm that is
+      what it is.
+    match:
+      signal: magic_mismatch
+      metadata:
+        detected_category: {not-in: [executable, archive]}
+
+  - id: FOR-009
+    name: Executable image embedded in an asset
+    severity: CRITICAL
+    detail: >-
+      A valid {format} executable header was found at offset {offset:.0f} of a
+      {carrier} file.
+    remediation: >-
+      Determine why an executable is embedded in this asset and what extracts
+      it. Verify the file against its upstream source.
+    match:
+      signal: executable_header
+
+  - id: FOR-011
+    name: Compressed archive embedded in a non-archive asset
+    severity: HIGH
+    detail: >-
+      A {format} stream was found at offset {offset:.0f} inside a {carrier}
+      file, which has no reason to contain one.
+    remediation: >-
+      Extract and inspect the embedded stream. Confirm the file matches its
+      upstream original.
+    match:
+      signal: embedded_archive
+      features:
+        offset: {min: 1}
+
+  - id: FOR-012
+    name: Data appended past the end of a container file
+    severity: HIGH
+    detail: >-
+      {trailing_bytes:.0f} bytes follow the end of this {format} file
+      (entropy {trailing_entropy:.2f}). The file renders normally; the trailing
+      bytes are invisible to anything that respects the format.
+    remediation: >-
+      This is the classic steganographic append. Extract the trailing bytes and
+      identify them, then find the code that seeks past the container's end.
+    match:
+      signal: trailing_data
+
+  - id: FOR-013
+    name: Opaque high-entropy fixture
+    severity: LOW
+    detail: >-
+      An unidentifiable binary of {size:.0f} bytes with entropy {entropy:.2f}
+      sits in a test or fixture directory.
+    remediation: >-
+      Weak on its own -- most such files are legitimate compiled or compressed
+      assets. It matters when something reads it; check whether any build script
+      or test does.
+    match:
+      signal: opaque_asset
+      # Only genuinely unidentifiable blobs are reported as a finding. Recognised
+      # archives in fixture directories still emit the signal -- the correlation
+      # engine needs them -- but a repository full of .tar.gz test data should
+      # not produce a wall of low-severity noise.
+      metadata:
+        identified: {equals: "no"}
+      features:
+        in_fixtures: {min: 1}
+        entropy: {min: 7.2}
