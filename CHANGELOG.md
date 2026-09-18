@@ -8,6 +8,18 @@ rules can fail a build that previously passed.
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-09-18
+
+### Changed
+
+- The GitHub Action's Marketplace name is now **Forensic Scan Action**. The
+  Marketplace requires a name unique across every action, GitHub username and
+  organization; "Forensic Scan" slugifies to `forensic-scan`, which is an
+  existing organization. The repository, PyPI package and CLI command are
+  unchanged.
+- The release workflow can be dispatched manually against a tag, so an existing
+  release can be republished without cutting a new one.
+
 ## [0.1.0] — 2026-09-17
 
 First release.
@@ -76,5 +88,6 @@ First release.
   parsed nothing, and reported no findings. The scan now loads grammars in a
   preflight and exits `2` if any are unavailable.
 
-[Unreleased]: https://github.com/mkamranr/forensic-scan/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mkamranr/forensic-scan/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/mkamranr/forensic-scan/releases/tag/v0.1.1
 [0.1.0]: https://github.com/mkamranr/forensic-scan/releases/tag/v0.1.0

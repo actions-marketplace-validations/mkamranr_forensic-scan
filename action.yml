@@ -1,4 +1,8 @@
-name: 'Forensic Scan'
+# The Marketplace requires this name to be globally unique across every action,
+# GitHub username and organization. "Forensic Scan" slugifies to `forensic-scan`,
+# which is an existing organization, so the listing carries the longer form. The
+# repository, PyPI package and CLI command are all still `forensic-scan`.
+name: 'Forensic Scan Action'
 description: 'Detect obfuscation, hidden logic and smuggled payloads in pull requests'
 author: 'forensic-scan contributors'
 

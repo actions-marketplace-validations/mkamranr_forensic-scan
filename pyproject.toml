@@ -1,6 +1,6 @@
 [project]
 name = "forensic-scan"
-version = "0.1.0"
+version = "0.1.1"
 description = "Forensic AST scanner for hidden logic, obfuscation and smuggled payloads in source repositories"
 readme = "README.md"
 license = "Apache-2.0"

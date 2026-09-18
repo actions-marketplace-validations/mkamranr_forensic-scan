@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0     # required: diff mode needs history
-      - uses: mkamranr/forensic-scan@v0.1.0
+      - uses: mkamranr/forensic-scan@v0.1.1
         with:
           fail-on: HIGH
 ```
