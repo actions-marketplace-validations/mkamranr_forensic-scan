@@ -11,6 +11,11 @@ jobs:
   pypi:
     name: publish to PyPI
     runs-on: ubuntu-latest
+    # Requires a PyPI trusted publisher, which has to be registered by hand at
+    # https://pypi.org/manage/account/publishing/ before it can work. Until that
+    # is done this job skips rather than failing the release. Enable with:
+    #   gh variable set PYPI_PUBLISH --body true
+    if: vars.PYPI_PUBLISH == 'true'
     environment: release
     permissions:
       id-token: write  # trusted publishing; no long-lived token exists to leak

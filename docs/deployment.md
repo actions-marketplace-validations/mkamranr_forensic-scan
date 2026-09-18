@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0     # required: diff mode needs history
-      - uses: mkamranr/forensic-scan@v1
+      - uses: mkamranr/forensic-scan@v0.1.0
         with:
           fail-on: HIGH
 ```
@@ -330,11 +330,23 @@ trusted publisher at <https://pypi.org/manage/account/publishing/>:
 Also create a `release` environment in the repository settings, ideally with a
 required reviewer.
 
-**4. Move the major tag** so `uses: mkamranr/forensic-scan@v1` keeps working:
+Then enable the job, which is opt-in so that a release does not fail before the
+trusted publisher exists:
 
 ```bash
-git tag -fa v1 -m "v1 -> v0.2.0" && git push origin v1 --force
+gh variable set PYPI_PUBLISH --body true
 ```
+
+**4. Move the floating major tag**, once the project is past 1.0, so that
+`uses: mkamranr/forensic-scan@v1` keeps resolving:
+
+```bash
+git tag -fa v1 -m "v1 -> v1.2.0" && git push origin v1 --force
+```
+
+Before 1.0 there is no `v1` tag, and workflows should pin an exact version
+(`@v0.1.0`). Publishing a `v1` tag pointing at a 0.x release would promise a
+stability guarantee the project has not made.
 
 **5. Verify the published artefacts.**
 

@@ -141,7 +141,7 @@ As a GitHub Action, findings become inline PR annotations:
 ```yaml
 - uses: actions/checkout@v4
   with: { fetch-depth: 0 }
-- uses: mkamranr/forensic-scan@v1
+- uses: mkamranr/forensic-scan@v0.1.0
   with:
     fail-on: HIGH
 ```
