@@ -337,6 +337,14 @@ trusted publisher exists:
 gh variable set PYPI_PUBLISH --body true
 ```
 
+To publish an existing tag without cutting a new release — which is what you
+want the first time credentials are wired up — dispatch the workflow manually:
+
+```bash
+gh workflow run release.yml -f tag=v0.1.0
+gh run watch $(gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId')
+```
+
 **4. Move the floating major tag**, once the project is past 1.0, so that
 `uses: mkamranr/forensic-scan@v1` keeps resolving:
 
